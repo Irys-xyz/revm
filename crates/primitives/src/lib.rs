@@ -11,6 +11,7 @@ mod bytecode;
 mod constants;
 pub mod db;
 pub mod env;
+pub mod irys;
 
 #[cfg(feature = "c-kzg")]
 pub mod kzg;
@@ -27,7 +28,8 @@ pub use bitvec;
 pub use bytecode::*;
 pub use constants::*;
 pub use env::*;
-
+pub use irys::genesis::*;
+pub use irys::*;
 cfg_if::cfg_if! {
     if #[cfg(all(not(feature = "hashbrown"), feature = "std"))] {
         pub use std::collections::{hash_map, hash_set, HashMap, HashSet};
