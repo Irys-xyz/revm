@@ -379,6 +379,10 @@ impl Database for BenchmarkDB {
                 balance: U256::from(10000000),
                 code: Some(self.0.clone()),
                 code_hash: self.1,
+                commitments: None,
+                stake: None,
+                mining_permission: None,
+                last_tx: None,
             }));
         }
         if address == Address::with_last_byte(1) {
@@ -387,6 +391,10 @@ impl Database for BenchmarkDB {
                 balance: U256::from(10000000),
                 code: None,
                 code_hash: KECCAK_EMPTY,
+                commitments: None,
+                stake: None,
+                mining_permission: None,
+                last_tx: None,
             }));
         }
         Ok(None)

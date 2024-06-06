@@ -421,6 +421,85 @@ impl JournaledState {
                     acc.info.code_hash = KECCAK_EMPTY;
                     acc.info.code = None;
                 }
+                JournalEntry::DataCostChange { address, cost } => {
+                    let acc = state.get_mut(&address).unwrap();
+                    acc.info.balance += cost;
+                }
+                JournalEntry::AddressStaked { address } => {
+                    let acc = state.get_mut(&address).unwrap();
+                    acc.info.stake = None;
+                }
+                JournalEntry::PartitionPledged { address, dest_hash } => {
+                    // let acc = state.get_mut(&address).unwrap();
+
+                    // match &mut acc.info.commitments {
+                    //     Some(pledges) => {
+                    //         let pledge_idx = pledges
+                    //             .iter()
+                    //             .position(|p| p.dest_hash == dest_hash)
+                    //             .expect(&format!(
+                    //                 // should *never* happen
+                    //                 "unable to find pledge {:?} for pledge revert of account {}",
+                    //                 &dest_hash, &address
+                    //             ));
+                    //         pledges.remove(pledge_idx);
+                    //     }
+                    //     None => panic!(
+                    //         // should *never* happen
+                    //         "pledges for {} empty in partition pledge revert for pledge {:?}",
+                    //         &address, &dest_hash
+                    //     ),
+                    // };
+                }
+                JournalEntry::PartitionUnPledge { address, dest_hash } => {
+                    // let acc = state.get_mut(&address).unwrap();
+
+                    // match &mut acc.info.commitments {
+                    //     Some(pledges) => {
+                    //         let pledge = &mut pledges
+                    //             .iter_mut()
+                    //             .find(|p| p.dest_hash == dest_hash)
+                    //             .expect(&format!(
+                    //                 // should *never* happen
+                    //                 "unable to find pledge {:?} for unpledge revert of account {}",
+                    //                 &dest_hash, &address
+                    //             ));
+                    //         // pledge.status = CommitmentStatus::Active;
+                    //     }
+                    //     None => panic!(
+                    //         // should *never* happen
+                    //         "pledges for {} empty in partition unpledge revert for pledge {:?}",
+                    //         &address, &dest_hash
+                    //     ),
+                    // };
+                }
+                JournalEntry::AddressUnstake {
+                    address,
+                    deactivated_pledges,
+                } => todo!(),
+                JournalEntry::AddressSlashed {} => todo!(),
+                JournalEntry::UpdateLastTx {
+                    address,
+                    prev_last_tx,
+                } => {
+                    let acc = state.get_mut(&address).unwrap();
+                    acc.info.last_tx = prev_last_tx;
+                }
+                JournalEntry::TxFee { address, fee } => {
+                    let acc = state.get_mut(&address).unwrap();
+                    acc.info.balance += fee;
+                }
+                JournalEntry::BlockReward { address, reward } => {
+                    let acc = state.get_mut(&address).unwrap();
+                    acc.info.balance -= reward;
+                }
+                JournalEntry::AccountDiff {
+                    address,
+                    old_account,
+                } => {
+                    let acc = state.get_mut(&address).unwrap();
+                    acc.info = old_account;
+                }
             }
         }
     }
@@ -849,7 +928,9 @@ pub enum JournalEntry {
     /// Only when account is called (to execute contract or transfer balance) only then account is made touched.
     /// Action: Mark account touched
     /// Revert: Unmark account touched
-    AccountTouched { address: Address },
+    AccountTouched {
+        address: Address,
+    },
     /// Transfer balance between two accounts
     /// Action: Transfer balance
     /// Revert: Transfer balance back
@@ -891,7 +972,73 @@ pub enum JournalEntry {
     /// Code changed
     /// Action: Account code changed
     /// Revert: Revert to previous bytecode.
-    CodeChange { address: Address },
+    CodeChange {
+        address: Address,
+    },
+
+    /// Account is billed for the cost of data
+    /// Action: Deduct cost from account
+    /// Revert: Revert Balance
+    DataCostChange {
+        address: Address,
+        cost: U256,
+    },
+
+    /// Account has staked
+    /// Action: deduct quantity from account, add stake record
+    /// Revert: revert quantity, remove stake record
+    AddressStaked {
+        address: Address,
+    },
+
+    /// Account has pledged to a partition
+    /// Action: insert pledge record, subtract quantity from balance
+    /// Revert: Revert quantity, remove pledge record
+    PartitionPledged {
+        address: Address,
+        dest_hash: DestHash,
+    },
+
+    /// Account has withdrawn their pledge from a partition
+    /// Action: refund the account, mark pledge as inactive
+    /// Revert: revert the refund, mark pledge as active
+    PartitionUnPledge {
+        address: Address,
+        dest_hash: DestHash,
+    },
+
+    /// Account has unstaked
+    /// Action: Deactive & refund stake and all active pledges
+    /// Revert: Activate stake & re-active pledges, revert refund
+    AddressUnstake {
+        address: Address,
+        deactivated_pledges: Option<Vec<(DestHash, CommitmentStatus)>>,
+    },
+
+    /// Account was slashed
+    /// Action: Mark all partitions and stake as `Slashed` - distribute funds to slashing parties
+    /// Revert: Restore partition & stake activation status, revert fund distribution
+    AddressSlashed {},
+
+    UpdateLastTx {
+        address: Address,
+        prev_last_tx: Option<LastTx>,
+    },
+
+    TxFee {
+        address: Address,
+        fee: U256,
+    },
+
+    BlockReward {
+        address: Address,
+        reward: U256,
+    },
+
+    AccountDiff {
+        address: Address,
+        old_account: AccountInfo,
+    },
 }
 
 /// SubRoutine checkpoint that will help us to go back from this
