@@ -50,7 +50,7 @@ version = "0.1.0"
 source = "git+https://github.com/alloy-rs/alloy.git?rev=44b8a6d#44b8a6da656602fd9fd2c52f28ecffa4acaed96c"
 dependencies = [
  "alloy-eips",
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-rlp",
  "alloy-serde",
  "c-kzg",
@@ -62,7 +62,7 @@ name = "alloy-eips"
 version = "0.1.0"
 source = "git+https://github.com/alloy-rs/alloy.git?rev=44b8a6d#44b8a6da656602fd9fd2c52f28ecffa4acaed96c"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-rlp",
  "alloy-serde",
  "c-kzg",
@@ -76,7 +76,7 @@ name = "alloy-genesis"
 version = "0.1.0"
 source = "git+https://github.com/alloy-rs/alloy.git?rev=44b8a6d#44b8a6da656602fd9fd2c52f28ecffa4acaed96c"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-serde",
  "serde",
  "serde_json",
@@ -87,7 +87,7 @@ name = "alloy-json-rpc"
 version = "0.1.0"
 source = "git+https://github.com/alloy-rs/alloy.git?rev=44b8a6d#44b8a6da656602fd9fd2c52f28ecffa4acaed96c"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "serde",
  "serde_json",
  "thiserror",
@@ -102,7 +102,7 @@ dependencies = [
  "alloy-consensus",
  "alloy-eips",
  "alloy-json-rpc",
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-rpc-types",
  "alloy-signer",
  "alloy-sol-types",
@@ -113,9 +113,31 @@ dependencies = [
 
 [[package]]
 name = "alloy-primitives"
-version = "0.7.4"
+version = "0.7.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db8aa973e647ec336810a9356af8aea787249c9d00b1525359f3db29a68d231b"
+checksum = "ccb3ead547f4532bc8af961649942f0b9c16ee9226e26caa3f38420651cc0bf4"
+dependencies = [
+ "alloy-rlp",
+ "bytes",
+ "cfg-if",
+ "const-hex",
+ "derive_more",
+ "hex-literal",
+ "itoa",
+ "k256",
+ "keccak-asm",
+ "proptest",
+ "rand",
+ "ruint",
+ "serde",
+ "tiny-keccak",
+]
+
+[[package]]
+name = "alloy-primitives"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a767e59c86900dd7c3ce3ecef04f3ace5ac9631ee150beb8b7d22f7fa3bbb2d7"
 dependencies = [
  "alloy-rlp",
  "arbitrary",
@@ -124,7 +146,6 @@ dependencies = [
  "const-hex",
  "derive_arbitrary",
  "derive_more",
- "ethereum_ssz",
  "getrandom",
  "hex-literal",
  "itoa",
@@ -146,7 +167,7 @@ dependencies = [
  "alloy-eips",
  "alloy-json-rpc",
  "alloy-network",
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-rpc-client",
  "alloy-rpc-types",
  "alloy-rpc-types-trace",
@@ -216,7 +237,7 @@ dependencies = [
  "alloy-consensus",
  "alloy-eips",
  "alloy-genesis",
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-rlp",
  "alloy-serde",
  "alloy-sol-types",
@@ -231,7 +252,7 @@ name = "alloy-rpc-types-trace"
 version = "0.1.0"
 source = "git+https://github.com/alloy-rs/alloy.git?rev=44b8a6d#44b8a6da656602fd9fd2c52f28ecffa4acaed96c"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-rpc-types",
  "alloy-serde",
  "serde",
@@ -243,7 +264,7 @@ name = "alloy-serde"
 version = "0.1.0"
 source = "git+https://github.com/alloy-rs/alloy.git?rev=44b8a6d#44b8a6da656602fd9fd2c52f28ecffa4acaed96c"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "serde",
  "serde_json",
 ]
@@ -253,7 +274,7 @@ name = "alloy-signer"
 version = "0.1.0"
 source = "git+https://github.com/alloy-rs/alloy.git?rev=44b8a6d#44b8a6da656602fd9fd2c52f28ecffa4acaed96c"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "async-trait",
  "auto_impl",
  "elliptic-curve",
@@ -314,7 +335,7 @@ version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40a64d2d2395c1ac636b62419a7b17ec39031d6b2367e66e9acbf566e6055e9c"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.7.7",
  "alloy-sol-macro",
  "const-hex",
  "serde",
@@ -1262,17 +1283,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ethereum_ssz"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e61ffea29f26e8249d35128a82ec8d3bd4fbc80179ea5f5e5e3daafef6a80fcb"
-dependencies = [
- "ethereum-types",
- "itertools 0.10.5",
- "smallvec",
-]
-
-[[package]]
 name = "ethers-contract"
 version = "2.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1396,7 +1406,6 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "835c052cb0c08c1acf6ffd71c022172e18723949c8282f2b9f27efbc51e64534"
 dependencies = [
- "arbitrary",
  "byteorder",
  "rand",
  "rustc-hex",
@@ -2729,13 +2738,13 @@ dependencies = [
 
 [[package]]
 name = "proptest-derive"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cf16337405ca084e9c78985114633b6827711d22b9e6ef6c6c0d665eb3f0b6e"
+checksum = "6ff7ff745a347b87471d859a377a9a404361e7efc2a971d73424a6d183c0fc77"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.66",
 ]
 
 [[package]]
@@ -3011,7 +3020,7 @@ dependencies = [
 name = "revm-primitives"
 version = "4.0.0"
 dependencies = [
- "alloy-primitives",
+ "alloy-primitives 0.8.0",
  "auto_impl",
  "bitflags 2.5.0",
  "bitvec",
@@ -3164,9 +3173,9 @@ dependencies = [
 
 [[package]]
 name = "ruint"
-version = "1.12.1"
+version = "1.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f308135fef9fc398342da5472ce7c484529df23743fb7c734e0f3d472971e62"
+checksum = "2c3cc4c2511671f327125da14133d0c5c5d137f006a1017a16f557bc85b16286"
 dependencies = [
  "alloy-rlp",
  "arbitrary",
@@ -3189,9 +3198,9 @@ dependencies = [
 
 [[package]]
 name = "ruint-macro"
-version = "1.2.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f86854cf50259291520509879a5c294c3c9a4c334e9ff65071c51e42ef1e2343"
+checksum = "48fd7bd8a6377e15ad9d42a8ec25371b94ddc67abe7c8b9127bec79bebaaae18"
 
 [[package]]
 name = "rustc-demangle"
@@ -4106,7 +4115,6 @@ version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "76f64bba2c53b04fcab63c01a7d7427eadc821e3bc48c34dc9ba29c501164b52"
 dependencies = [
- "arbitrary",
  "byteorder",
  "crunchy",
  "hex",
