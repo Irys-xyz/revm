@@ -3,14 +3,22 @@ use alloy_rlp::{Decodable, Encodable, Error as RlpError};
 use arbitrary::Arbitrary as PledgeArbitrary;
 use bytes::Buf;
 use proptest_derive::Arbitrary as PledgePropTestArbitrary;
-use reth_codecs::{main_codec, Compact};
+use reth_codecs::Compact;
 
 use super::commitment::IrysTxId;
 
 #[derive(PartialEq, Debug, Eq, Clone, Copy, Hash)]
-#[main_codec(no_arbitrary)]
-#[derive(PledgeArbitrary, PledgePropTestArbitrary)]
+// #[main_codec(no_arbitrary)]
+// #[derive(PledgeArbitrary, PledgePropTestArbitrary)]
+// #[derive(
+//     Compact,
+//     serde::Serialize,
+//     serde::Deserialize,
+//     RlpEncodable,
+//     RlpDecodable
+// )]
 
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
 pub enum DestHash {
     Address(Address),
     // txId has the same length as part_hash

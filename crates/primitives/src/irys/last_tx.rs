@@ -1,18 +1,24 @@
+use core::default;
+
 use alloy_rlp::{Decodable, Encodable, Error as RlpError};
 use arbitrary::Arbitrary as PledgeArbitrary;
 use bytes::Buf;
 use proptest_derive::Arbitrary as PledgePropTestArbitrary;
-use reth_codecs::{main_codec, Compact};
+use reth_codecs::Compact;
 
 use super::commitment::{IrysBlockHash, IrysTxId};
 
 #[derive(PartialEq, Debug, Eq, Clone, Copy, Hash)]
-#[main_codec(no_arbitrary)]
-#[derive(PledgeArbitrary, PledgePropTestArbitrary)]
-
+#[derive( serde::Serialize, serde::Deserialize, Compact)]
 pub enum LastTx {
     BlockHash(IrysBlockHash),
     TxId(IrysTxId),
+}
+
+impl Default for LastTx {
+    fn default() -> Self {
+        Self::BlockHash(IrysBlockHash::default()) 
+    }
 }
 
 #[derive(PartialEq, Debug, Eq, Clone, Copy)]

@@ -8,7 +8,7 @@ use alloy_rlp::{
 use arbitrary::Arbitrary as PledgeArbitrary;
 use bytes::Buf;
 use proptest_derive::Arbitrary as PledgePropTestArbitrary;
-use reth_codecs::{main_codec, Compact};
+use reth_codecs::Compact;
 
 use super::DestHash;
 
@@ -18,8 +18,6 @@ use super::DestHash;
     Compact,
     serde::Serialize,
     serde::Deserialize,
-    PledgeArbitrary,
-    PledgePropTestArbitrary,
     RlpEncodable,
     RlpDecodable,
 )]
@@ -52,9 +50,7 @@ impl Commitment {
 // }
 
 #[derive(PartialEq, Debug, Default, Eq, Clone, Copy, Hash)]
-// #[derive(Compact, serde::Serialize, serde::Deserialize)]
-#[derive(PledgeArbitrary, PledgePropTestArbitrary)]
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
 pub enum CommitmentStatus {
     #[default]
     /// Stake is pending epoch activation
@@ -113,8 +109,7 @@ impl Decodable for CommitmentStatus {
 }
 
 #[derive(PartialEq, Debug, Default, Eq, Clone, Copy, Hash)]
-// #[derive(Compact, serde::Serialize, serde::Deserialize)]
-#[main_codec]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
 pub enum CommitmentType {
     #[default]
     Stake = 2,
@@ -170,8 +165,12 @@ impl Decodable for CommitmentType {
     }
 }
 
-#[main_codec]
 #[derive(Debug, Clone, PartialEq, Hash, Eq, Default, RlpEncodableWrapper, RlpDecodableWrapper)]
+#[derive(
+    Compact,
+    serde::Serialize,
+    serde::Deserialize
+)]
 pub struct Commitments(pub Vec<Commitment>);
 
 // impl Commitments {
@@ -244,8 +243,15 @@ impl From<Vec<Commitment>> for Commitments {
 }
 
 #[derive(PartialEq, Debug, Default, Eq, Clone, Copy, Hash)]
-#[main_codec(no_arbitrary)]
-#[derive(PledgeArbitrary, PledgePropTestArbitrary, RlpEncodable, RlpDecodable)]
+// #[main_codec(no_arbitrary)]
+// #[derive(PledgeArbitrary, PledgePropTestArbitrary, RlpEncodable, RlpDecodable)]
+#[derive(
+    Compact,
+    serde::Serialize,
+    serde::Deserialize,
+    RlpEncodable,
+    RlpDecodable,
+)]
 pub struct Stake {
     pub tx_id: IrysTxId,
     pub quantity: U256,
@@ -267,7 +273,7 @@ wrap_fixed_bytes!(
 
 impl Compact for IrysBlockHash {
     #[inline]
-    fn to_compact<B>(self, buf: &mut B) -> usize
+    fn to_compact<B>(&self, buf: &mut B) -> usize
     where
         B: bytes::BufMut + AsMut<[u8]>,
     {
@@ -290,7 +296,7 @@ wrap_fixed_bytes!(
 // this is done "manually" here to prevent acyclic deps, which is why these structs are defined here in the first place...
 impl Compact for IrysTxId {
     #[inline]
-    fn to_compact<B>(self, buf: &mut B) -> usize
+    fn to_compact<B>(&self, buf: &mut B) -> usize
     where
         B: bytes::BufMut + AsMut<[u8]>,
     {

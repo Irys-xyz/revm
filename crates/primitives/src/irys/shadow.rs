@@ -11,11 +11,8 @@ use alloy_rlp::{
     Decodable, Encodable, Error as RlpError, RlpDecodable, RlpDecodableWrapper, RlpEncodable,
     RlpEncodableWrapper,
 };
-use reth_codecs::main_codec;
 
 pub use alloy_primitives::{Address, U256};
-use arbitrary::Arbitrary as ShadowArbitrary;
-use proptest_derive::Arbitrary as ShadowPropTestArbitrary;
 
 use crate::{commitment::IrysTxId, DestHash, DestHash::PartitionHash};
 
@@ -28,12 +25,11 @@ use super::new_account::NewAccountState;
     PartialEq,
     Eq,
     Hash,
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
     RlpEncodable,
-    RlpDecodable,
+    RlpDecodable
 )]
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 
 pub struct ShadowTx {
     pub tx_id: IrysTxId,
@@ -42,8 +38,9 @@ pub struct ShadowTx {
     pub address: Address,
     pub tx: ShadowTxType,
 }
-#[main_codec(no_arbitrary)]
-#[derive(ShadowArbitrary, ShadowPropTestArbitrary, Debug, Clone, Eq, PartialEq, Hash)]
+#[derive( Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 pub enum ShadowTxType {
     Null, // because default is a required derive TODO: replace with a null TransferShadow or some other no-op
     Transfer(TransferShadow),
@@ -183,10 +180,8 @@ impl Default for ShadowTxType {
     }
 }
 
-#[main_codec(no_arbitrary)]
+
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
     Debug,
     Copy,
     Clone,
@@ -195,16 +190,18 @@ impl Default for ShadowTxType {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
 )]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 pub struct TransferShadow {
     pub to: Address,
     pub amount: U256,
 }
 
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
     Debug,
     Copy,
     Clone,
@@ -213,15 +210,17 @@ pub struct TransferShadow {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
+
 )]
 
 pub struct DataShadow {
     pub fee: U256,
 }
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
+
     Debug,
     Copy,
     Clone,
@@ -230,16 +229,18 @@ pub struct DataShadow {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
+
 )]
 
 pub struct MiningAddressStakeShadow {
     pub value: U256,
     pub height: u64,
 }
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
+
     Debug,
     Copy,
     Clone,
@@ -248,6 +249,8 @@ pub struct MiningAddressStakeShadow {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
+
 )]
 
 pub struct PartitionPledgeShadow {
@@ -257,10 +260,10 @@ pub struct PartitionPledgeShadow {
 }
 
 // todo: below are NOT FINAL
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
+
     Debug,
     Copy,
     Clone,
@@ -269,14 +272,15 @@ pub struct PartitionPledgeShadow {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
+
 )]
 pub struct PartitionUnPledgeShadow {
     pub part_hash: IrysTxId,
 }
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
+
     Debug,
     Copy,
     Clone,
@@ -285,14 +289,14 @@ pub struct PartitionUnPledgeShadow {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
 )]
 
 pub struct UnstakeShadow {}
 
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
+
     Debug,
     Copy,
     Clone,
@@ -301,15 +305,15 @@ pub struct UnstakeShadow {}
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
 )]
 pub struct SlashShadow {
     pub slashed_addr: Address,
 }
 
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
+
     Debug,
     Copy,
     Clone,
@@ -318,15 +322,14 @@ pub struct SlashShadow {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
 )]
 pub struct BlockRewardShadow {
     pub reward: U256,
 }
 
-#[main_codec(no_arbitrary)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
 #[derive(
-    ShadowArbitrary,
-    ShadowPropTestArbitrary,
     Debug,
     Clone,
     Eq,
@@ -334,12 +337,14 @@ pub struct BlockRewardShadow {
     Hash,
     RlpEncodable,
     RlpDecodable,
+    Default
 )]
 pub struct DiffShadow {
     pub new_state: NewAccountState,
 }
 
-#[main_codec]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 #[derive(Debug, Clone, PartialEq, Eq, Default, Hash, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct Shadows(Vec<ShadowTx>);
 

@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use reth_codecs::{main_codec, Compact};
+use reth_codecs::Compact;
 
 use crate::{
     commitment::{Commitments, Stake},
@@ -12,14 +12,79 @@ use crate::{
 use crate::{Bytes, B256, U256};
 use alloy_genesis::{ChainConfig, CliqueConfig};
 use alloy_serde::{
-    num::{u128_opt_via_ruint, u128_via_ruint, u64_opt_via_ruint, u64_via_ruint},
     storage::deserialize_storage_map,
 };
+
 use serde::{Deserialize, Serialize};
 
 use super::last_tx::LastTx;
 
-/// The genesis block specification.
+// /// The genesis block specification.
+// #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+// #[serde(rename_all = "camelCase", default)]
+// pub struct Genesis {
+//     /// The fork configuration for this network.
+//     #[serde(default)]
+//     pub config: ChainConfig,
+//     /// The genesis header nonce.
+//     #[serde(with = "u64_via_ruint")]
+//     pub nonce: u64,
+//     /// The genesis header timestamp.
+//     #[serde(with = "u64_via_ruint")]
+//     pub timestamp: u64,
+//     /// The genesis header extra data.
+//     pub extra_data: Bytes,
+//     /// The genesis header gas limit.
+//     #[serde(with = "u128_via_ruint")]
+//     pub gas_limit: u128,
+//     /// The genesis header difficulty.
+//     pub difficulty: U256,
+//     /// The genesis header mix hash.
+//     pub mix_hash: B256,
+//     /// The genesis header coinbase address.
+//     pub coinbase: Address,
+//     /// The initial state of accounts in the genesis block.
+//     pub alloc: BTreeMap<Address, GenesisAccount>,
+//     // NOTE: the following fields:
+//     // * base_fee_per_gas
+//     // * excess_blob_gas
+//     // * blob_gas_used
+//     // * number
+//     // should NOT be set in a real genesis file, but are included here for compatibility with
+//     // consensus tests, which have genesis files with these fields populated.
+//     /// The genesis header base fee
+//     #[serde(
+//         default,
+//         skip_serializing_if = "Option::is_none",
+//         with = "u128_opt_via_ruint"
+//     )]
+//     pub base_fee_per_gas: Option<u128>,
+//     /// The genesis header excess blob gas
+//     #[serde(
+//         default,
+//         skip_serializing_if = "Option::is_none",
+//         with = "u128_opt_via_ruint"
+//     )]
+//     pub excess_blob_gas: Option<u128>,
+//     /// The genesis header blob gas used
+//     #[serde(
+//         default,
+//         skip_serializing_if = "Option::is_none",
+//         with = "u128_opt_via_ruint"
+//     )]
+//     pub blob_gas_used: Option<u128>,
+//     /// The genesis block number
+//     #[serde(
+//         default,
+//         skip_serializing_if = "Option::is_none",
+//         with = "u64_opt_via_ruint"
+//     )]
+//     pub number: Option<u64>,
+//     #[serde(default, skip_serializing_if = "Option::is_none")]
+//     pub shadows: Option<Shadows>,
+// }
+
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Genesis {
@@ -27,16 +92,16 @@ pub struct Genesis {
     #[serde(default)]
     pub config: ChainConfig,
     /// The genesis header nonce.
-    #[serde(with = "u64_via_ruint")]
+    #[serde(with = "alloy_serde::quantity")]
     pub nonce: u64,
     /// The genesis header timestamp.
-    #[serde(with = "u64_via_ruint")]
+    #[serde(with = "alloy_serde::quantity")]
     pub timestamp: u64,
     /// The genesis header extra data.
     pub extra_data: Bytes,
     /// The genesis header gas limit.
-    #[serde(with = "u128_via_ruint")]
-    pub gas_limit: u128,
+    #[serde(with = "alloy_serde::quantity")]
+    pub gas_limit: u64,
     /// The genesis header difficulty.
     pub difficulty: U256,
     /// The genesis header mix hash.
@@ -53,34 +118,19 @@ pub struct Genesis {
     // should NOT be set in a real genesis file, but are included here for compatibility with
     // consensus tests, which have genesis files with these fields populated.
     /// The genesis header base fee
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "u128_opt_via_ruint"
-    )]
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "alloy_serde::quantity::opt")]
     pub base_fee_per_gas: Option<u128>,
     /// The genesis header excess blob gas
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "u128_opt_via_ruint"
-    )]
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "alloy_serde::quantity::opt")]
     pub excess_blob_gas: Option<u128>,
     /// The genesis header blob gas used
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "u128_opt_via_ruint"
-    )]
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "alloy_serde::quantity::opt")]
     pub blob_gas_used: Option<u128>,
     /// The genesis block number
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "u64_opt_via_ruint"
-    )]
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "alloy_serde::quantity::opt")]
     pub number: Option<u64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+
+        #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shadows: Option<Shadows>,
 }
 
@@ -172,7 +222,7 @@ impl Genesis {
     }
 
     /// Set the gas limit.
-    pub const fn with_gas_limit(mut self, gas_limit: u128) -> Self {
+    pub const fn with_gas_limit(mut self, gas_limit: u64) -> Self {
         self.gas_limit = gas_limit;
         self
     }
@@ -228,15 +278,12 @@ impl Genesis {
     }
 }
 
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct GenesisAccount {
     /// The nonce of the account at genesis.
-    #[serde(
-        skip_serializing_if = "Option::is_none",
-        with = "u64_opt_via_ruint",
-        default
-    )]
+    #[serde(skip_serializing_if = "Option::is_none", with = "alloy_serde::quantity::opt", default)]
     pub nonce: Option<u64>,
     /// The balance of the account at genesis.
     pub balance: U256,
@@ -253,7 +300,6 @@ pub struct GenesisAccount {
     /// The account's private key. Should only be used for testing.
     #[serde(rename = "secretKey", default, skip_serializing_if = "Option::is_none")]
     pub private_key: Option<B256>,
-
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub commitments: Option<Commitments>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -265,22 +311,27 @@ pub struct GenesisAccount {
     pub last_tx: Option<LastTx>,
 }
 
-#[main_codec]
+
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Compact, Serialize, Deserialize)]
+
 struct StorageEntries {
     entries: Vec<StorageEntry>,
 }
 
-#[main_codec]
+
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Compact, Serialize, Deserialize)]
+
 struct StorageEntry {
     key: B256,
     value: B256,
 }
 
 // compactable variant of GenesisAccount
-#[main_codec]
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Compact, Serialize, Deserialize)]
+
 struct CompactGenesisAccount {
     /// The nonce of the account at genesis.
     nonce: Option<u64>,
@@ -299,22 +350,22 @@ struct CompactGenesisAccount {
 }
 
 impl Compact for GenesisAccount {
-    fn to_compact<B>(self, buf: &mut B) -> usize
+    fn to_compact<B>(&self, buf: &mut B) -> usize
     where
         B: bytes::BufMut + AsMut<[u8]>,
     {
         let account = CompactGenesisAccount {
             nonce: self.nonce,
             balance: self.balance,
-            code: self.code,
-            storage: self.storage.map(|s| StorageEntries {
+            code: self.code.clone(),
+            storage: self.storage.clone().map(|s| StorageEntries {
                 entries: s
                     .into_iter()
                     .map(|(key, value)| StorageEntry { key, value })
                     .collect(),
             }),
             stake: self.stake,
-            commitments: self.commitments,
+            commitments: self.commitments.clone(),
             private_key: self.private_key,
             mining_permission: self.mining_permission,
             last_tx: self.last_tx,

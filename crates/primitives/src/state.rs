@@ -350,6 +350,7 @@ impl AccountInfo {
             nonce: 1,
             code: Some(bytecode),
             code_hash: hash,
+            ..Default::default()
         }
     }
 }

@@ -1,16 +1,16 @@
 use alloy_primitives::U256;
 use alloy_rlp::{RlpDecodable, RlpEncodable};
 
-use reth_codecs::{main_codec, Compact};
+use reth_codecs::Compact;
 
 use super::{
     commitment::{Commitments, Stake},
     last_tx::LastTx,
 };
 
-// temporary arbitrary account diff logic
-// remove me!
-#[main_codec]
+
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+
 #[derive(Debug, Default, Clone, Eq, PartialEq, Hash, RlpEncodable, RlpDecodable)]
 #[rlp(trailing)]
 pub struct NewAccountState {
@@ -30,16 +30,16 @@ pub struct NewAccountState {
     pub mining_permission: Option<bool>,
 }
 // weird how many problems can be solved with wrapper structs
-#[main_codec]
-#[derive(Debug, Clone, Eq, PartialEq, Hash, RlpEncodable, RlpDecodable)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, RlpEncodable, RlpDecodable, Default)]
 #[rlp(trailing)]
 pub struct WrappedStake(pub Option<Stake>);
 
-#[main_codec]
-#[derive(Debug, Clone, Eq, PartialEq, Hash, RlpEncodable, RlpDecodable)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, RlpEncodable, RlpDecodable, Default)]
 #[rlp(trailing)]
 pub struct WrappedCommitments(pub Option<Commitments>);
-#[main_codec]
-#[derive(Debug, Clone, Eq, PartialEq, Hash, RlpEncodable, RlpDecodable)]
+#[derive(Compact, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, RlpEncodable, RlpDecodable, Default)]
 #[rlp(trailing)]
 pub struct WrappedLastTx(pub Option<LastTx>);
