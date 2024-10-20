@@ -1,3 +1,4 @@
+use irys_primitives::{CommitmentStatus, DestHash, LastTx};
 use revm_interpreter::Eip7702CodeLoad;
 
 use crate::{
@@ -5,7 +6,7 @@ use crate::{
     primitives::{
         db::Database, hash_map::Entry, Account, Address, Bytecode, EVMError, EvmState,
         EvmStorageSlot, HashMap, HashSet, Log, SpecId, SpecId::*, TransientStorage, B256,
-        KECCAK_EMPTY, PRECOMPILE3, U256, DestHash, CommitmentStatus, LastTx, AccountInfo
+        KECCAK_EMPTY, PRECOMPILE3, U256, AccountInfo
     },
 };
 use core::mem;

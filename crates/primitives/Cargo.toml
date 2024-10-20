@@ -5,9 +5,9 @@ edition = "2021"
 keywords = ["ethereum", "evm", "no_std", "revm", "types"]
 license = "MIT"
 name = "revm-primitives"
+readme = "../../README.md"
 repository = "https://github.com/bluealloy/revm"
 version = "10.0.0"
-readme = "../../README.md"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -28,14 +28,14 @@ alloy-eip7702 = { version = "0.1", default-features = false, features = [
     "k256",
 ] }
 alloy-primitives = { version = "0.8.7", default-features = false, features = [
-    "rlp",
     "map",
+    "rlp",
 ] }
 
 # mics
 auto_impl = "1.2"
-bitvec = { version = "1", default-features = false, features = ["alloc"] }
 bitflags = { version = "2.6.0", default-features = false }
+bitvec = { version = "1", default-features = false, features = ["alloc"] }
 
 # For setting the CfgEnv KZGSettings. Enabled by c-kzg flag.
 c-kzg = { version = "1.0.3", default-features = false, optional = true, features = [
@@ -61,15 +61,16 @@ alloy-serde = { version = "0.4.2", default-features = false }
 alloy-rlp = "0.3.4"
 
 # utility
-enumn = "0.1"
 cfg-if = "1"
+enumn = "0.1"
 # derive_more = { version = "0.99", optional = true }
 dyn-clone = "1.0"
 
 # irys
+derive_more = { version = "1", features = ["full"] }
+irys-primitives = { path = "../../../../crates/primitives" }
 reth-codecs = { path = "../../../reth/crates/storage/codecs" }
 test-fuzz = "6"
-derive_more = { version = "1", features = ["full"] }
 # serde = { version = "1.0", default-features = false }
 
 
@@ -90,58 +91,58 @@ thiserror = "1.0.61"
 hex = { version = "0.4", default-features = false }
 
 [features]
-default = ["std", "c-kzg", "portable", "serde"]
-std = [
-     # "serde?/std",
-    "alloy-primitives/std",
-    "hex/std",
-    "bitvec/std",
-    "bitflags/std",
-    "alloy-eip7702/std",
-    "alloy-eip2930/std",
-]
-hashbrown = ["alloy-primitives/map-hashbrown"]
-serde = [
-    # "dep:serde",
-    "alloy-primitives/serde",
-    "hex/serde",
-    "bitvec/serde",
-    "bitflags/serde",
-    "c-kzg?/serde",
-    "alloy-eip7702/serde",
-    "alloy-eip2930/serde",
-]
 arbitrary = [
-    "std",
+    "alloy-eip2930/arbitrary",
+    "alloy-eip7702/arbitrary",
     "alloy-primitives/arbitrary",
     "bitflags/arbitrary",
-    "alloy-eip7702/arbitrary",
-    "alloy-eip2930/arbitrary",
+    "std",
 ]
 asm-keccak = ["alloy-primitives/asm-keccak"]
+default = ["c-kzg", "portable", "serde", "std"]
+hashbrown = ["alloy-primitives/map-hashbrown"]
 portable = ["c-kzg?/portable"]
+serde = [
+    # "dep:serde",
+    "alloy-eip2930/serde",
+    "alloy-eip7702/serde",
+    "alloy-primitives/serde",
+    "bitflags/serde",
+    "bitvec/serde",
+    "c-kzg?/serde",
+    "hex/serde",
+]
+std = [
+    # "serde?/std",
+    "alloy-eip2930/std",
+    "alloy-eip7702/std",
+    "alloy-primitives/std",
+    "bitflags/std",
+    "bitvec/std",
+    "hex/std",
+]
 
 optimism = []
 # Optimism default handler enabled Optimism handler register by default in EvmBuilder.
-optimism-default-handler = ["optimism"]
 negate-optimism-default-handler = []
+optimism-default-handler = ["optimism"]
 
 dev = [
     "memory_limit",
     "optional_balance_check",
+    "optional_beneficiary_reward",
     "optional_block_gas_limit",
     "optional_eip3607",
     "optional_gas_refund",
     "optional_no_base_fee",
-    "optional_beneficiary_reward",
 ]
 memory_limit = []
 optional_balance_check = []
+optional_beneficiary_reward = []
 optional_block_gas_limit = []
 optional_eip3607 = []
 optional_gas_refund = []
 optional_no_base_fee = []
-optional_beneficiary_reward = []
 rand = ["alloy-primitives/rand"]
 
 # See comments in `revm-precompile`

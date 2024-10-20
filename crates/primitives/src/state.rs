@@ -1,9 +1,9 @@
 use crate::{
-    commitment::{Commitments, Stake},
-    last_tx::LastTx,
+
     Address, Bytecode, HashMap, B256, SpecId, KECCAK_EMPTY, U256,
 };
 use bitflags::bitflags;
+use irys_primitives::{Commitments, LastTx, Stake};
 use core::hash::{Hash, Hasher};
 
 /// EVM State is a mapping from addresses to accounts.
