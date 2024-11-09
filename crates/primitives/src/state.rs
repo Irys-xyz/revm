@@ -1,10 +1,7 @@
-use crate::{
-
-    Address, Bytecode, HashMap, B256, SpecId, KECCAK_EMPTY, U256,
-};
+use crate::{Address, Bytecode, HashMap, SpecId, B256, KECCAK_EMPTY, U256};
 use bitflags::bitflags;
-use irys_primitives::{Commitments, LastTx, Stake};
 use core::hash::{Hash, Hasher};
+use irys_primitives::{Commitments, LastTx, Stake};
 
 /// EVM State is a mapping from addresses to accounts.
 pub type EvmState = HashMap<Address, Account>;
@@ -305,7 +302,12 @@ impl AccountInfo {
     /// - nonce is zero
     pub fn is_empty(&self) -> bool {
         let code_empty = self.is_empty_code_hash() || self.code_hash.is_zero();
-        code_empty && self.balance.is_zero() && self.nonce == 0 && self.commitments.is_none() && self.stake.is_none()
+        code_empty
+            && self.balance.is_zero()
+            && self.nonce == 0
+            && self.commitments.is_none()
+            && self.stake.is_none()
+            && self.last_tx.is_none()
     }
 
     /// Returns `true` if the account is not empty.
