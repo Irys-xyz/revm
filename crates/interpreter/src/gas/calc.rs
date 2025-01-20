@@ -1,4 +1,10 @@
-use revm_primitives::eip7702;
+use revm_primitives::{
+    eip7702,
+    irys_primitives::{
+        precompile::{ACCESS_KEY_NOP, PD_COST_PER_CHUNK, PD_PRECOMPILE_ADDRESS},
+        range_specifier::PdAccessListArg,
+    },
+};
 
 use super::constants::*;
 use crate::{
@@ -386,9 +392,28 @@ pub fn validate_initial_tx_gas(
 
     // get number of access list account and storages.
     if spec_id.is_enabled_in(SpecId::BERLIN) {
-        let accessed_slots: usize = access_list.iter().map(|item| item.storage_keys.len()).sum();
-        initial_gas += access_list.len() as u64 * ACCESS_LIST_ADDRESS;
-        initial_gas += accessed_slots as u64 * ACCESS_LIST_STORAGE_KEY;
+        for access_list_item in access_list {
+            // always charge the address cost
+            initial_gas += ACCESS_LIST_ADDRESS;
+            if access_list_item.address != PD_PRECOMPILE_ADDRESS {
+                // normal cost logic for the access list
+                initial_gas += access_list_item.storage_keys.len() as u64 * ACCESS_LIST_STORAGE_KEY;
+            } else {
+                // custom logic - we only bill for valid chunk read ranges
+                for key in &access_list_item.storage_keys {
+                    initial_gas += match PdAccessListArg::decode(key) {
+                        Ok(dec) => match dec {
+                            PdAccessListArg::ChunkRead(range_specifier) => {
+                                range_specifier.chunk_count as u64 * PD_COST_PER_CHUNK
+                            }
+                            // we bill at a reduced rate for any other (or malformed) keys - as these will never trigger a valid storage load, but do still consume space.
+                            _ => ACCESS_KEY_NOP,
+                        },
+                        Err(_) => ACCESS_KEY_NOP,
+                    }
+                }
+            }
+        }
     }
 
     // base stipend

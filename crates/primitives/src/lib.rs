@@ -35,6 +35,7 @@ pub use eip7702::{
     RecoveredAuthorization, Signature, SignedAuthorization, EIP7702_MAGIC, EIP7702_MAGIC_BYTES,
 };
 pub use env::*;
+pub use irys_primitives;
 // pub use irys::genesis::*;
 // pub use irys::*;
 #[cfg(any(feature = "c-kzg", feature = "kzg-rs"))]

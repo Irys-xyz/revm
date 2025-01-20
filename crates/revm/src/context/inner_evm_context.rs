@@ -1,3 +1,5 @@
+use irys_primitives::precompile::PD_PRECOMPILE_ADDRESS;
+
 use crate::{
     db::Database,
     interpreter::{
@@ -104,6 +106,10 @@ impl<DB: Database> InnerEvmContext<DB> {
             storage_keys,
         } in self.env.tx.access_list.iter()
         {
+            // skip loading keys associated with the PD contract
+            if *address == PD_PRECOMPILE_ADDRESS {
+                continue;
+            }
             self.journaled_state.initial_account_load(
                 *address,
                 storage_keys.iter().map(|i| U256::from_be_bytes(i.0)),
