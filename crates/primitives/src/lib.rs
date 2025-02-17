@@ -12,6 +12,7 @@ mod constants;
 pub mod db;
 pub mod eip7702;
 pub mod env;
+// pub mod irys;
 
 #[cfg(any(feature = "c-kzg", feature = "kzg-rs"))]
 pub mod kzg;
@@ -34,7 +35,9 @@ pub use eip7702::{
     RecoveredAuthorization, Signature, SignedAuthorization, EIP7702_MAGIC, EIP7702_MAGIC_BYTES,
 };
 pub use env::*;
-
+pub use irys_primitives;
+// pub use irys::genesis::*;
+// pub use irys::*;
 #[cfg(any(feature = "c-kzg", feature = "kzg-rs"))]
 pub use kzg::{EnvKzgSettings, KzgSettings};
 pub use precompile::*;

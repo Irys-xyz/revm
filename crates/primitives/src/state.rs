@@ -1,6 +1,7 @@
 use crate::{Address, Bytecode, HashMap, SpecId, B256, KECCAK_EMPTY, U256};
 use bitflags::bitflags;
 use core::hash::{Hash, Hasher};
+use irys_primitives::{Commitments, LastTx, Stake};
 
 /// EVM State is a mapping from addresses to accounts.
 pub type EvmState = HashMap<Address, Account>;
@@ -221,7 +222,7 @@ impl EvmStorageSlot {
 }
 
 /// AccountInfo account information.
-#[derive(Clone, Debug, Eq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AccountInfo {
     /// Account balance.
@@ -233,6 +234,11 @@ pub struct AccountInfo {
     /// code: if None, `code_by_hash` will be used to fetch it if code needs to be loaded from
     /// inside `revm`.
     pub code: Option<Bytecode>,
+    /// custom pledge addition
+    pub stake: Option<Stake>,
+    pub commitments: Option<Commitments>,
+    pub last_tx: Option<LastTx>,
+    pub mining_permission: Option<bool>,
 }
 
 impl Default for AccountInfo {
@@ -242,15 +248,11 @@ impl Default for AccountInfo {
             code_hash: KECCAK_EMPTY,
             code: Some(Bytecode::default()),
             nonce: 0,
+            commitments: None,
+            stake: None,
+            mining_permission: None,
+            last_tx: None,
         }
-    }
-}
-
-impl PartialEq for AccountInfo {
-    fn eq(&self, other: &Self) -> bool {
-        self.balance == other.balance
-            && self.nonce == other.nonce
-            && self.code_hash == other.code_hash
     }
 }
 
@@ -259,16 +261,30 @@ impl Hash for AccountInfo {
         self.balance.hash(state);
         self.nonce.hash(state);
         self.code_hash.hash(state);
+        // TODO: add for pledges
     }
 }
 
 impl AccountInfo {
-    pub fn new(balance: U256, nonce: u64, code_hash: B256, code: Bytecode) -> Self {
+    pub fn new(
+        balance: U256,
+        nonce: u64,
+        code_hash: B256,
+        code: Bytecode,
+        commitments: Option<Commitments>,
+        stake: Option<Stake>,
+        last_tx: Option<LastTx>,
+        mining_permission: Option<bool>,
+    ) -> Self {
         Self {
             balance,
             nonce,
             code: Some(code),
             code_hash,
+            commitments,
+            stake,
+            mining_permission,
+            last_tx,
         }
     }
 
@@ -286,7 +302,12 @@ impl AccountInfo {
     /// - nonce is zero
     pub fn is_empty(&self) -> bool {
         let code_empty = self.is_empty_code_hash() || self.code_hash.is_zero();
-        code_empty && self.balance.is_zero() && self.nonce == 0
+        code_empty
+            && self.balance.is_zero()
+            && self.nonce == 0
+            && self.commitments.is_none()
+            && self.stake.is_none()
+            && self.last_tx.is_none()
     }
 
     /// Returns `true` if the account is not empty.
@@ -331,6 +352,7 @@ impl AccountInfo {
             nonce: 1,
             code: Some(bytecode),
             code_hash: hash,
+            ..Default::default()
         }
     }
 }
