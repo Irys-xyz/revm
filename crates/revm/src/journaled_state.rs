@@ -1,17 +1,15 @@
-use irys_primitives::{CommitmentStatus, DestHash, LastTx};
-use revm_interpreter::Eip7702CodeLoad;
-
 use crate::{
     interpreter::{AccountLoad, InstructionResult, SStoreResult, SelfDestructResult, StateLoad},
     primitives::{
-        db::Database, hash_map::Entry, Account, Address, Bytecode, EVMError, EvmState,
+        db::Database, hash_map::Entry, Account, AccountInfo, Address, Bytecode, EVMError, EvmState,
         EvmStorageSlot, HashMap, HashSet, Log, SpecId, SpecId::*, TransientStorage, B256,
-        KECCAK_EMPTY, PRECOMPILE3, U256, AccountInfo
+        KECCAK_EMPTY, PRECOMPILE3, U256,
     },
 };
 use core::mem;
+use irys_primitives::{CommitmentStatus, DestHash, LastTx};
+use revm_interpreter::Eip7702CodeLoad;
 use std::vec::Vec;
-
 
 /// A journal of state changes internal to the EVM.
 ///
@@ -431,6 +429,7 @@ impl JournaledState {
                     let acc = state.get_mut(&address).unwrap();
                     acc.info.stake = None;
                 }
+                #[allow(unused_variables)]
                 JournalEntry::PartitionPledged { address, dest_hash } => {
                     // let acc = state.get_mut(&address).unwrap();
 
@@ -453,6 +452,7 @@ impl JournaledState {
                     //     ),
                     // };
                 }
+                #[allow(unused_variables)]
                 JournalEntry::PartitionUnPledge { address, dest_hash } => {
                     // let acc = state.get_mut(&address).unwrap();
 
@@ -475,6 +475,7 @@ impl JournaledState {
                     //     ),
                     // };
                 }
+                #[allow(unused_variables)]
                 JournalEntry::AddressUnstake {
                     address,
                     deactivated_pledges,
@@ -916,7 +917,9 @@ pub enum JournalEntry {
     /// Used to mark account that is warm inside EVM in regards to EIP-2929 AccessList.
     /// Action: We will add Account to state.
     /// Revert: we will remove account from state.
-    AccountWarmed { address: Address },
+    AccountWarmed {
+        address: Address,
+    },
     /// Mark account to be destroyed and journal balance to be reverted
     /// Action: Mark account and transfer the balance
     /// Revert: Unmark the account and transfer balance back
@@ -950,7 +953,9 @@ pub enum JournalEntry {
     /// Create account:
     /// Actions: Mark account as created
     /// Revert: Unmart account as created and reset nonce to zero.
-    AccountCreated { address: Address },
+    AccountCreated {
+        address: Address,
+    },
     /// Entry used to track storage changes
     /// Action: Storage change
     /// Revert: Revert to previous value
@@ -962,7 +967,10 @@ pub enum JournalEntry {
     /// Entry used to track storage warming introduced by EIP-2929.
     /// Action: Storage warmed
     /// Revert: Revert to cold state
-    StorageWarmed { address: Address, key: U256 },
+    StorageWarmed {
+        address: Address,
+        key: U256,
+    },
     /// It is used to track an EIP-1153 transient storage change.
     /// Action: Transient storage changed.
     /// Revert: Revert to previous value.
